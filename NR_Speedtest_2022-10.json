@@ -1,0 +1,233 @@
+[
+    {
+        "id": "24b51f58.c6cbd8",
+        "type": "tab",
+        "label": "Speedtest 2022-10",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "24b97f95.e15ee8",
+        "type": "inject",
+        "z": "24b51f58.c6cbd8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 230,
+        "y": 100,
+        "wires": [
+            [
+                "37a85c9d.18736c"
+            ]
+        ]
+    },
+    {
+        "id": "b6cbc9e5.d2a53",
+        "type": "debug",
+        "z": "24b51f58.c6cbd8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 590,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "6f2f00b5.af1518",
+        "type": "ui_chart",
+        "z": "24b51f58.c6cbd8",
+        "name": "",
+        "group": "91b79613.d028",
+        "order": 1,
+        "width": "12",
+        "height": "6",
+        "label": "Broadband Speed",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "24",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#ff2600",
+            "#00f900",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "x": 630,
+        "y": 200,
+        "wires": [
+            []
+        ],
+        "outputLabels": [
+            "Snitt vind",
+            "Vind byar"
+        ]
+    },
+    {
+        "id": "cd0f5c8d.122f9",
+        "type": "function",
+        "z": "24b51f58.c6cbd8",
+        "name": "Get speed Down/Up",
+        "func": "\nvar down = {};\ndown.payload = parseInt(msg.payload.Download) / 1000000;\ndown.topic = \"Download\";\n\nvar up = {};\nup.payload = parseInt(msg.payload.Upload) / 1000000;\nup.topic = \"Upload\";\n\nreturn [down, up];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 260,
+        "y": 180,
+        "wires": [
+            [
+                "b6cbc9e5.d2a53",
+                "619e857d.fec3c4",
+                "6f2f00b5.af1518"
+            ],
+            [
+                "6f2f00b5.af1518"
+            ]
+        ]
+    },
+    {
+        "id": "5c5679c9.aedf3",
+        "type": "debug",
+        "z": "24b51f58.c6cbd8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 610,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "619e857d.fec3c4",
+        "type": "function",
+        "z": "24b51f58.c6cbd8",
+        "name": "If speed below X Mbps => send mail",
+        "func": "\nif (msg.payload <= 5){\n    var speed = msg.payload\n    msg = {};\n    msg.topic = \"Broadband download speed\";\n    msg.payload = (\"Warning ! The download speed have been below 10 Mbps. Now \" + speed + \" Mbps\");\n    return msg;\n}\nelse {return null}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 260,
+        "wires": [
+            [
+                "5a3b3509.f094c4",
+                "5c5679c9.aedf3"
+            ]
+        ]
+    },
+    {
+        "id": "37a85c9d.18736c",
+        "type": "exec",
+        "z": "24b51f58.c6cbd8",
+        "command": "speedtest --csv --secure",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Run speedtest",
+        "x": 400,
+        "y": 100,
+        "wires": [
+            [
+                "46c5faa0.7b1824"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "46c5faa0.7b1824",
+        "type": "csv",
+        "z": "24b51f58.c6cbd8",
+        "name": "CSV to Java object",
+        "sep": ",",
+        "hdrin": "",
+        "hdrout": "none",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "Server ID,Sponsor,Server Name,Timestamp,Distance,Ping,Download,Upload,Share,IP Address",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 630,
+        "y": 100,
+        "wires": [
+            [
+                "cd0f5c8d.122f9"
+            ]
+        ]
+    },
+    {
+        "id": "5a3b3509.f094c4",
+        "type": "e-mail",
+        "z": "24b51f58.c6cbd8",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "secure": true,
+        "tls": false,
+        "name": "xxxx.yyy@icloud.com",
+        "dname": "Mail ",
+        "credentials": {},
+        "x": 590,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "91b79613.d028",
+        "type": "ui_group",
+        "name": "Speed",
+        "tab": "3e69db85.60f7cc",
+        "order": 1,
+        "disp": false,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "3e69db85.60f7cc",
+        "type": "ui_tab",
+        "name": "Broadband",
+        "icon": "dashboard",
+        "order": 5
+    }
+]
