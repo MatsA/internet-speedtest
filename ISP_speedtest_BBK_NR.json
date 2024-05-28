@@ -1,0 +1,203 @@
+[
+    {
+        "id": "2282c8f1.9bde88",
+        "type": "tab",
+        "label": "Export",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "64f855fb48caa3f9",
+        "type": "inject",
+        "z": "2282c8f1.9bde88",
+        "name": "Interval 20 minutes",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1200",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 120,
+        "wires": [
+            [
+                "14f354cf715d14ab"
+            ]
+        ]
+    },
+    {
+        "id": "7e0fa5efe6368a13",
+        "type": "function",
+        "z": "2282c8f1.9bde88",
+        "name": "Get speed Down/Up",
+        "func": "\nvar msg0 = {};\nmsg0.payload = parseInt(msg.payload.Download);\nmsg0.topic = \"Download, Mb/s\";\n\nglobal.set('internetDownload', msg0.payload);\n\nvar msg1 = {};\nmsg1.payload = parseInt(msg.payload.Upload);\nmsg1.topic = \"Upload, Mb/s\";\n\nvar msg2 = {};\nmsg2.payload = parseInt(msg.payload.Latency);\nmsg2.topic = \"Latency, MilliSeconds\";\n\nreturn [msg0, msg1, msg2];",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 120,
+        "wires": [
+            [
+                "279691a0e82f8f18"
+            ],
+            [
+                "279691a0e82f8f18"
+            ],
+            [
+                "279691a0e82f8f18"
+            ]
+        ]
+    },
+    {
+        "id": "14f354cf715d14ab",
+        "type": "exec",
+        "z": "2282c8f1.9bde88",
+        "command": "bbk_cli --quiet",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Run speedtest",
+        "x": 320,
+        "y": 120,
+        "wires": [
+            [
+                "afa9d75ca03da0fc"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "afa9d75ca03da0fc",
+        "type": "csv",
+        "z": "2282c8f1.9bde88",
+        "name": "CSV to Java object",
+        "sep": " ",
+        "hdrin": "",
+        "hdrout": "none",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "Latency,Download,Upload",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 510,
+        "y": 120,
+        "wires": [
+            [
+                "7e0fa5efe6368a13"
+            ]
+        ]
+    },
+    {
+        "id": "279691a0e82f8f18",
+        "type": "ui_chart",
+        "z": "2282c8f1.9bde88",
+        "name": "",
+        "group": "c9b5ed79.42c188",
+        "order": 2,
+        "width": "12",
+        "height": "5",
+        "label": "Broadband info",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "48",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#ff2600",
+            "#00f900",
+            "#fffb00",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 960,
+        "y": 120,
+        "wires": [
+            []
+        ],
+        "outputLabels": [
+            "Snitt vind"
+        ]
+    },
+    {
+        "id": "d45d43d707eda1c7",
+        "type": "inject",
+        "z": "2282c8f1.9bde88",
+        "name": "Clear chart",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[ ]",
+        "payloadType": "json",
+        "x": 680,
+        "y": 180,
+        "wires": [
+            [
+                "279691a0e82f8f18"
+            ]
+        ]
+    },
+    {
+        "id": "c9b5ed79.42c188",
+        "type": "ui_group",
+        "name": "Speed/Day light",
+        "tab": "314dd61d.c7af7a",
+        "order": 1,
+        "disp": false,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "314dd61d.c7af7a",
+        "type": "ui_tab",
+        "name": "Light/Broadband",
+        "icon": "dashboard",
+        "order": 7,
+        "disabled": false,
+        "hidden": false
+    }
+]
